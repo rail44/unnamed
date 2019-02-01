@@ -1,0 +1,22 @@
+{
+  "name": "unnamed",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/unnamed.js",
+  "types": "dist/unnamed.d.ts",
+  "files": [
+      "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rail44/unnamed.git"
+  },
+  "script": {
+      "build": "rm -rf dist && tsc"
+  },
+  "author": "Satoshi Amemiya <amemiya@protonmail.com>",
+  "license": "Unlicense",
+  "devDependencies": {
+    "typescript": "^3.3.1"
+  }
+}
