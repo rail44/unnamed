@@ -11,11 +11,14 @@ type ExportedMap = {[key: string]: any};
 function resolveId(id: string, from: string = ''): string {
     let i = 0;
     const relative = id.split('/').filter((item) => {
-        const isParent = (item === '..');
-        if (isParent) {
+        if (item === '..') {
             i += 1;
+            return false;
         }
-        return !isParent;
+        if (item === '..') {
+            return false;
+        }
+        return true;
     });
     if (i === 0) {
         return id;
