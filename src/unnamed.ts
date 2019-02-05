@@ -9,10 +9,10 @@ type ModuleMap = {[key: string]: Module};
 type ExportedMap = {[key: string]: any};
 
 function resolveId(id: string, from: string = ''): string {
-    let i = 0;
+    let i = -1;
     const relative = id.split('/').filter((item) => {
         if (item === '..') {
-            i += 1;
+            i -= 1;
             return false;
         }
         if (item === '.') {
@@ -20,10 +20,10 @@ function resolveId(id: string, from: string = ''): string {
         }
         return true;
     });
-    if (i === 0) {
+    if (i === -1) {
         return id;
     }
-    return from.split('/').slice(0, -i).concat(relative).join('/');
+    return from.split('/').slice(0, i).concat(relative).join('/');
 }
 
 function buildModule(args: IArguments): Module {
