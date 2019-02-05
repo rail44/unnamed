@@ -8,6 +8,42 @@ interface Module {
 type ModuleMap = {[key: string]: Module};
 type ExportedMap = {[key: string]: any};
 
+function resolveId(id: string, from: string = ''): string {
+    let i = 0;
+    const relative = id.split('/').filter((item) => {
+        const isParent = (item === '..');
+        if (isParent) {
+            i += 1;
+        }
+        return !isParent;
+    });
+    if (i === 0) {
+        return id;
+    }
+    return from.split('/').slice(0, -i).concat(relative).join('/');
+}
+
+function buildModule(args: IArguments): Module {
+    let id;
+    let i = 0;
+    if (typeof args[0] === 'string') {
+        id = args[0];
+        i += 1;
+    }
+
+    let dependencies = ['require', 'exports'];
+    if (Array.isArray(args[i])) {
+        dependencies = args[i];
+        i += 1;
+    }
+
+    return {
+        id,
+        dependencies,
+        factory: args[i],
+    }
+}
+
 export class Unnamed {
     private moduleMap: ModuleMap;
     private exportedMap: ExportedMap;
@@ -23,7 +59,7 @@ export class Unnamed {
     }
 
     define() {
-        const module = this.buildModule(arguments);
+        const module = buildModule(arguments);
         if (module.id !== undefined) {
             this.moduleMap[module.id] = module;
             return;
@@ -71,14 +107,15 @@ export class Unnamed {
             return {}
         }
 
-        const instantiated = this.exportedMap[id];
+        const absoluteId = resolveId(id, from);
+
+        const instantiated = this.exportedMap[absoluteId];
         if (instantiated !== undefined) {
             return instantiated;
         }
 
-        const module = this.popModule(id);
+        const module = this.popModule(absoluteId);
         if (module === undefined) {
-            console.error('Could not find module with id `'+id+'`');
             return {}
         }
 
@@ -102,26 +139,5 @@ export class Unnamed {
         }
 
         return module.factory;
-    }
-
-    private buildModule(args: IArguments): Module {
-        let id;
-        let i = 0;
-        if (typeof args[0] === 'string') {
-            id = args[0];
-            i += 1;
-        }
-
-        let dependencies = ['require', 'exports'];
-        if (Array.isArray(args[i])) {
-            dependencies = args[i];
-            i += 1;
-        }
-
-        return {
-            id,
-            dependencies,
-            factory: args[i],
-        }
     }
 }
