@@ -15,7 +15,7 @@ function resolveId(id: string, from: string = ''): string {
             i += 1;
             return false;
         }
-        if (item === '..') {
+        if (item === '.') {
             return false;
         }
         return true;
