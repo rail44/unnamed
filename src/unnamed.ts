@@ -8,21 +8,17 @@ interface Module {
 type ModuleMap = {[key: string]: Module};
 type ExportedMap = {[key: string]: any};
 
+const currentDirPattern = /^\.\//;
+
 function resolveId(id: string, from: string = ''): string {
     let i = -1;
-    const relative = id.split('/').filter((item) => {
+    const relative = id.replace(currentDirPattern, '').split('/').filter((item) => {
         if (item === '..') {
             i -= 1;
             return false;
         }
-        if (item === '.') {
-            return false;
-        }
         return true;
     });
-    if (i === -1) {
-        return id;
-    }
     return from.split('/').slice(0, i).concat(relative).join('/');
 }
 
@@ -30,7 +26,7 @@ function buildModule(args: IArguments): Module {
     let id;
     let i = 0;
     if (typeof args[0] === 'string') {
-        id = args[0];
+        id = args[0].replace(currentDirPattern, '');
         i += 1;
     }
 
