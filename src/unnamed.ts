@@ -59,12 +59,19 @@ export class Unnamed {
 
     define() {
         const module = buildModule(arguments);
-        if (module.id !== undefined) {
-            this.moduleMap[module.id] = module;
+        if (module.id === undefined) {
+            this.instantiate(module)
             return;
         }
 
-        this.instantiate(module)
+
+        if (module.id in this.exportedMap ||
+            module.id in this.moduleMap)
+        {
+            return;
+        }
+
+        this.moduleMap[module.id] = module;
     }
 
     require() {
