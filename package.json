@@ -1,7 +1,7 @@
 {
   "name": "@rail44/unnamed",
-  "version": "0.0.7",
-  "description": "",
+  "version": "0.0.8",
+  "description": "Minimal AMD loader without dynamic fetching",
   "main": "dist/unnamed.js",
   "types": "dist/unnamed.d.ts",
   "files": [
