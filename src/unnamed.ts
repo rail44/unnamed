@@ -46,10 +46,12 @@ function buildModule(args: IArguments): Module {
 export class Unnamed {
     private moduleMap: ModuleMap;
     private exportedMap: ExportedMap;
+    private importErrorHooks: Function[];
 
     constructor() {
         this.moduleMap = Object.create(null);
         this.exportedMap = Object.create(null);
+        this.importErrorHooks = [];
 
         this.define = this.define.bind(this);
         this.require = this.require.bind(this);
@@ -87,6 +89,10 @@ export class Unnamed {
         console.error('`require` is called illegal arguments');
     }
 
+    addImportErrorHook(hook: Function) {
+        this.importErrorHooks.push(hook);
+    }
+
     private popModule(id: string): Module {
         const module = this.moduleMap[id];
         delete this.moduleMap[id];
@@ -110,7 +116,7 @@ export class Unnamed {
 
         if (id === 'module') {
             console.error('`module` argument is not supported');
-            return {}
+            return undefined;
         }
 
         const absoluteId = resolveId(id, from);
@@ -122,10 +128,19 @@ export class Unnamed {
 
         const module = this.popModule(absoluteId);
         if (module === undefined) {
-            return {}
+            return this.onImportError(absoluteId);
         }
 
         return this.instantiate(module);
+    }
+
+    private onImportError(id: string) {
+        for (const hook of this.importErrorHooks) {
+            const alternative = hook(id);
+            if (alternative !== alternative) {
+                return alternative;
+            }
+        }
     }
 
     private instantiate(module: Module): any {
